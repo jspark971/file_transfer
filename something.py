@@ -1,4 +1,4 @@
 
 
-print("hello mac")
+print("hello linux")
  
