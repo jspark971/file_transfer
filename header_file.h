@@ -3,7 +3,6 @@
 
 using namespace std;
 
-void print_hello_world();
-int add(int a, int b);
-int sub(int a, int b);
+double gsl_sf_fermi_dirac_int(const int j,const double x);
+double gsl_sf_fermi_dirac_2(const double x);
 #endif
