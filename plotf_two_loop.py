@@ -9,7 +9,6 @@ from matplotlib.ticker import AutoMinorLocator
 import matplotlib.colors as colors
 import h5py
 
-
 def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
     new_cmap = colors.LinearSegmentedColormap.from_list(
         'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
@@ -63,75 +62,79 @@ def magnitude(r,i):
 def makeplot(location):
     filename1 = location+"/output.h5"
     filename2 = location+"/output_two_loop.h5"
-
-    f=h5py.File(filename1,"r")
+    filenames = [filename1, filename2]
     fig, axes = plt.subplots(4, 2, sharex=True, figsize=(8,12))
-    t = np.array(f["r(cm)"]) / clight * 1e12
-    fmatrixf = np.array(f["fmatrixf"])
 
-    for ig in range(ng):
-        r = fmatrixf[:,0,ig,0,1,0]
-        axes[0, 0].plot(t, fmatrixf[:,0,ig,0,0,0], '-', color=line_color(ig,ng,cmap), linewidth=1.5)
-        p, = axes[1, 0].plot(t, fmatrixf[:,0,ig,1,1,0], '-', color=line_color(ig,ng,cmap), linewidth=1.5)
-        axes[2, 0].plot(t, fmatrixf[:,0,ig,1,0,0]/fmatrixf[0,0,ig,1,0,0], '-', color=line_color(ig,ng,cmap), linewidth=1.5)
-        axes[3, 0].plot(t, fmatrixf[:,0,ig,1,0,1]/fmatrixf[0,0,ig,1,0,0], '-', color=line_color(ig,ng,cmap), linewidth=1.5)
-        if(ig==0):
-            p1=p
-    for ig in range(ng):
-        r = fmatrixf[:,1,ig,0,1,0]
-        axes[0, 0].plot(t, fmatrixf[:,1,ig,0,0,0], '--', color=line_color(ig,ng,cmap), linewidth=1.5)
-        p, = axes[1, 0].plot(t, fmatrixf[:,1,ig,1,1,0], '--', color=line_color(ig,ng,cmap), linewidth=1.5)
-        axes[2, 0].plot(t, fmatrixf[:,1,ig,1,0,0]/fmatrixf[0,1,ig,1,0,0], '--', color=line_color(ig,ng,cmap), linewidth=1.5)
-        axes[3, 0].plot(t, fmatrixf[:,1,ig,1,0,1]/fmatrixf[0,1,ig,1,0,0], '--', color=line_color(ig,ng,cmap), linewidth=1.5)
-        if ig==0:
-            p2=p
-            axes[1, 0].legend([p1,p2],[r"$f$",r"$\bar{f}$"],fontsize=22, ncol=2,loc='upper center',bbox_to_anchor=(0.5, 1), handletextpad=0, frameon=False)
+    for filename in filenames:
+        index = filenames.index(filename)
 
-    #axes[2].grid()
-    axes[3, 0].set_xlabel(r"$t\,(\mathrm{ps})$",fontsize=22)
-    #axes[2].set_ylabel(r"$f_{e\mu}(t)/f_{e\mu}(0)$",fontsize=22)
-    #axes[2].savefig("foffdiag.pdf",bbox_inches="tight")
+        f=h5py.File(filename,"r")
+        t = np.array(f["r(cm)"]) / clight * 1e12
+        fmatrixf = np.array(f["fmatrixf"])
 
+        for ig in range(ng):
+            r = fmatrixf[:,0,ig,0,1,0]
+            axes[0, index].plot(t, fmatrixf[:,0,ig,0,0,0], '-', color=line_color(ig,ng,cmap), linewidth=1.5)
+            p, = axes[1, index].plot(t, fmatrixf[:,0,ig,1,1,0], '-', color=line_color(ig,ng,cmap), linewidth=1.5)
+            axes[2, index].plot(t, fmatrixf[:,0,ig,1,0,0]/fmatrixf[0,0,ig,1,0,0], '-', color=line_color(ig,ng,cmap), linewidth=1.5)
+            axes[3, index].plot(t, fmatrixf[:,0,ig,1,0,1]/fmatrixf[0,0,ig,1,0,0], '-', color=line_color(ig,ng,cmap), linewidth=1.5)
+            if(ig==0):
+                p1=p
+        for ig in range(ng):
+            r = fmatrixf[:,1,ig,0,1,0]
+            axes[0, index].plot(t, fmatrixf[:,1,ig,0,0,0], '--', color=line_color(ig,ng,cmap), linewidth=1.5)
+            p, = axes[1, index].plot(t, fmatrixf[:,1,ig,1,1,0], '--', color=line_color(ig,ng,cmap), linewidth=1.5)
+            axes[2, index].plot(t, fmatrixf[:,1,ig,1,0,0]/fmatrixf[0,1,ig,1,0,0], '--', color=line_color(ig,ng,cmap), linewidth=1.5)
+            axes[3, index].plot(t, fmatrixf[:,1,ig,1,0,1]/fmatrixf[0,1,ig,1,0,0], '--', color=line_color(ig,ng,cmap), linewidth=1.5)
+            if ig==0:
+                p2=p
+                axes[1, index].legend([p1,p2],[r"$f$",r"$\bar{f}$"],fontsize=22, ncol=2,loc='upper center',bbox_to_anchor=(0.5, 1), handletextpad=0, frameon=False)
 
-    #####################################
-
-
-    #if ig==0:
-    #    axes[0].legend([p1,p2],[r"$f_{ee}$",r"$f_{\mu\mu}$"], fontsize=22,loc="upper right", ncol=2, frameon=False)
-    #    axes[1].legend([p3,p4],[r"$\bar{f}_{ee}$",r"$\bar{f}_{\mu\mu}$"],fontsize=22,loc="upper right", ncol=2, frameon=False)
+        #axes[2].grid()
+        axes[3, index].set_xlabel(r"$t\,(\mathrm{ps})$",fontsize=22)
+        #axes[2].set_ylabel(r"$f_{e\mu}(t)/f_{e\mu}(0)$",fontsize=22)
+        #axes[2].savefig("foffdiag.pdf",bbox_inches="tight")
 
 
-    # colorbar
-    cax = fig.add_axes([.92, 0.1, 0.04, 0.8])
-    norm = mpl.colors.Normalize(vmin=0, vmax=E[-1])
-    cb1 = mpl.colorbar.ColorbarBase(cax, cmap=cmap,norm=norm,orientation='vertical')
-    cb1.set_label(r'$h\nu\,(\mathrm{MeV})$')
-    cax.minorticks_on()
+        #####################################
 
-    #axes[0].set_xlabel(r"$t\,\mathrm{(ms)}$",fontsize=22)
-    #axes[0].set_ylabel(r"$f(t)/f(0)$",fontsize=22)
-    ylabelx = -.15
-    plt.text(ylabelx,0.5,r"$f_{ee}(t)$",horizontalalignment='center',verticalalignment='center', transform=axes[0, 0].transAxes,rotation=90,fontsize=22)
-    plt.text(ylabelx,0.5,r"$f_{\mu\mu}(t)$",horizontalalignment='center',verticalalignment='center', transform=axes[1, 0].transAxes,rotation=90,fontsize=22)
-    plt.text(ylabelx,0.5,r"$f_{(x)}(t)/f_{(x)}(0)$",horizontalalignment='center',verticalalignment='center', transform=axes[2, 0].transAxes,rotation=90,fontsize=22)
-    plt.text(ylabelx,0.5,r"$f_{(y)}(t)/f_{(x)}(0)$",horizontalalignment='center',verticalalignment='center', transform=axes[3, 0].transAxes,rotation=90,fontsize=22)
-    plt.subplots_adjust(wspace=0, hspace=0)
-    plt.minorticks_on()
-    axes[0,0].yaxis.set_major_locator(plt.MultipleLocator(.5))
-    axes[1,0].yaxis.set_major_locator(plt.MultipleLocator(.2))
-    axes[2,0].yaxis.set_major_locator(plt.MultipleLocator(.5))
-    axes[3,0].yaxis.set_major_locator(plt.MultipleLocator(.5))
-    #axes[0].set_ylim(0,1.001)
-    #axes[1].set_ylim(0,1)
-    axes[2,0].set_ylim(-1.4,1.4)
-    axes[3,0].set_ylim(-1.4,1.4)
-    for ax in axes:
-        ax.xaxis.set_minor_locator(AutoMinorLocator())
-        ax.yaxis.set_minor_locator(AutoMinorLocator())
-        #ax.ticklabel_format(useOffset=False)
-        #ax.set_xlim(0,.68)
 
-    plt.savefig(location+"/f_short_two_loop.pdf",bbox_inches="tight")
+        #if ig==0:
+        #    axes[0].legend([p1,p2],[r"$f_{ee}$",r"$f_{\mu\mu}$"], fontsize=22,loc="upper right", ncol=2, frameon=False)
+        #    axes[1].legend([p3,p4],[r"$\bar{f}_{ee}$",r"$\bar{f}_{\mu\mu}$"],fontsize=22,loc="upper right", ncol=2, frameon=False)
+
+
+        # colorbar
+        cax = fig.add_axes([.92, 0.1, 0.04, 0.8])
+        norm = mpl.colors.Normalize(vmin=0, vmax=E[-1])
+        cb1 = mpl.colorbar.ColorbarBase(cax, cmap=cmap,norm=norm,orientation='vertical')
+        cb1.set_label(r'$h\nu\,(\mathrm{MeV})$')
+        cax.minorticks_on()
+
+        #axes[0].set_xlabel(r"$t\,\mathrm{(ms)}$",fontsize=22)
+        #axes[0].set_ylabel(r"$f(t)/f(0)$",fontsize=22)
+        ylabelx = -.15
+        plt.text(ylabelx,0.5,r"$f_{ee}(t)$",horizontalalignment='center',verticalalignment='center', transform=axes[0, 0].transAxes,rotation=90,fontsize=22)
+        plt.text(ylabelx,0.5,r"$f_{\mu\mu}(t)$",horizontalalignment='center',verticalalignment='center', transform=axes[1, 0].transAxes,rotation=90,fontsize=22)
+        plt.text(ylabelx,0.5,r"$f_{(x)}(t)/f_{(x)}(0)$",horizontalalignment='center',verticalalignment='center', transform=axes[2, 0].transAxes,rotation=90,fontsize=22)
+        plt.text(ylabelx,0.5,r"$f_{(y)}(t)/f_{(x)}(0)$",horizontalalignment='center',verticalalignment='center', transform=axes[3, 0].transAxes,rotation=90,fontsize=22)
+        plt.subplots_adjust(wspace=0, hspace=0)
+        plt.minorticks_on()
+        axes[0,index].yaxis.set_major_locator(plt.MultipleLocator(.5))
+        axes[1,index].yaxis.set_major_locator(plt.MultipleLocator(.2))
+        axes[2,index].yaxis.set_major_locator(plt.MultipleLocator(.5))
+        axes[3,index].yaxis.set_major_locator(plt.MultipleLocator(.5))
+        #axes[0].set_ylim(0,1.001)
+        #axes[1].set_ylim(0,1)
+        axes[2,index].set_ylim(-1.4,1.4)
+        axes[3,index].set_ylim(-1.4,1.4)
+        # for ax in axes:
+        #     ax.xaxis.set_minor_locator(AutoMinorLocator())
+        #     ax.yaxis.set_minor_locator(AutoMinorLocator())
+            #ax.ticklabel_format(useOffset=False)
+            #ax.set_xlim(0,.68)
+
+        plt.savefig(location+"/f_short_two_loop.pdf",bbox_inches="tight")
 
 
 
