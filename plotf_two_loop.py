@@ -9,6 +9,7 @@ from matplotlib.ticker import AutoMinorLocator
 import matplotlib.colors as colors
 import h5py
 
+
 def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
     new_cmap = colors.LinearSegmentedColormap.from_list(
         'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
