@@ -60,10 +60,11 @@ def magnitude(r,i):
     return np.sqrt(r**2 + i**2)
 
 def makeplot(location):
-    filename1 = location+"/output.h5"
-    filename2 = location+"/output_two_loop.h5"
+    filename1 = location+"/OFF_two_loop/output.h5"
+    filename2 = location+"/ON_two_loop/output.h5"
     filenames = [filename1, filename2]
-    fig, axes = plt.subplots(4, 2, sharex=True, figsize=(8,12))
+    nrows, ncols = 4, 2
+    fig, axes = plt.subplots(nrows, ncols, sharex=True, figsize=(8,12))
 
     for filename in filenames:
         index = filenames.index(filename)
@@ -128,6 +129,12 @@ def makeplot(location):
         #axes[1].set_ylim(0,1)
         axes[2,index].set_ylim(-1.4,1.4)
         axes[3,index].set_ylim(-1.4,1.4)
+
+        for i in range(nrows):
+            for j in range(ncols):
+                axes[i,j].xaxis.set_minor_locator(AutoMinorLocator())
+                axes[i,j].yaxis.set_minor_locator(AutoMinorLocator())
+
         # for ax in axes:
         #     ax.xaxis.set_minor_locator(AutoMinorLocator())
         #     ax.yaxis.set_minor_locator(AutoMinorLocator())
